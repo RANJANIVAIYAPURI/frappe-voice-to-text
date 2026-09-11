@@ -1,0 +1,84 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-09-10 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "title",
+  "language",
+  "status",
+  "audio_recorder_ui",
+  "audio_file",
+  "transcribe",
+  "transcript"
+ ],
+ "fields": [
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Title",
+   "reqd": 1
+  },
+  {
+   "default": "en",
+   "fieldname": "language",
+   "fieldtype": "Link",
+   "label": "Language",
+   "options": "Language"
+  },
+  {
+   "default": "Draft",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nProcessing\nCompleted\nFailed"
+  },
+  {
+   "fieldname": "audio_recorder_ui",
+   "fieldtype": "HTML",
+   "label": "Voice Recorder"
+  },
+  {
+   "fieldname": "audio_file",
+   "fieldtype": "Attach",
+   "label": "Saved Audio File"
+  },
+  {
+   "fieldname": "transcribe",
+   "fieldtype": "Button",
+   "label": "Transcribe"
+  },
+  {
+   "fieldname": "transcript",
+   "fieldtype": "Text Editor",
+   "label": "Transcript"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-09-11 03:12:00.997566",
+ "modified_by": "Administrator",
+ "module": "Voice To Text",
+ "name": "Voice Recording",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

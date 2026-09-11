@@ -1,0 +1,6 @@
+app_name = "voice_to_text"
+app_title = "Voice to Text"
+app_publisher = "Custom"
+app_description = "AI Voice to Text Transcription"
+app_email = "admin@example.com"
+app_license = "mit"

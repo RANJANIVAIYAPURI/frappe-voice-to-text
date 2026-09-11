@@ -1,0 +1,119 @@
+import frappe
+import os
+import requests
+from frappe.model.document import Document
+
+class VoiceRecording(Document):
+    pass
+
+@frappe.whitelist()
+def transcribe_audio(docname):
+    doc = frappe.get_doc("Voice Recording", docname)
+
+    if not doc.audio_file:
+        frappe.throw("No audio file found attached to this document.")
+
+    doc.status = "Processing"
+    doc.save()
+    frappe.db.commit()
+
+    try:
+        api_key = frappe.conf.get("openai_api_key")
+
+        if not api_key:
+            frappe.throw("OpenAI API Key not configured in site_config.json")
+
+        # Frappe Attach fields store values such as:
+        # /files/voice_recording.webm
+        # Convert that URL to the actual file path safely.
+        file_path = frappe.get_site_path("public", doc.audio_file.lstrip("/"))
+
+        if not os.path.exists(file_path):
+            frappe.throw(f"Audio file not found: {file_path}")
+
+        import mimetypes
+
+        mime_type, _ = mimetypes.guess_type(file_path)
+
+        if not mime_type:
+            mime_type = "application/octet-stream"
+
+        headers = {
+            "Authorization": f"Bearer {api_key}"
+        }
+
+        with open(file_path, "rb") as audio_file_obj:
+            files = {
+                "file": (
+                    os.path.basename(file_path),
+                    audio_file_obj,
+                    mime_type
+                )
+            }
+
+            data = {
+                "model": "whisper-1",
+                "language": doc.language if doc.language else "en"
+            }
+
+            response = requests.post(
+                "https://api.openai.com/v1/audio/transcriptions",
+                headers=headers,
+                files=files,
+                data=data
+            )
+
+        res_json = response.json()
+
+        if response.status_code == 200:
+            doc.transcript = res_json.get("text", "")
+            doc.status = "Completed"
+        else:
+            doc.status = "Failed"
+            doc.transcript = str(res_json)
+
+        doc.save()
+        frappe.db.commit()
+
+        return {
+            "status": doc.status,
+            "transcript": doc.transcript
+        }
+
+    except Exception as e:
+        doc.status = "Failed"
+        doc.transcript = str(e)
+        doc.save()
+        frappe.db.commit()
+
+        frappe.log_error(
+            title="Transcription Failed",
+            message=frappe.get_traceback()
+        )
+
+        frappe.throw(str(e))
+
+
+import base64
+import frappe
+from frappe.utils.file_manager import save_file
+
+@frappe.whitelist()
+def upload_voice_recording(file_name, filedata, doctype, docname):
+    # Strip the data URL prefix if present (e.g. "data:audio/webm;base64,...")
+    if "," in filedata:
+        filedata = filedata.split(",")[1]
+        
+    # Decode base64 to binary
+    file_bytes = base64.b64decode(filedata)
+    
+    # Securely save the file and attach it to the document
+    saved_file = save_file(
+        fname=file_name,
+        content=file_bytes,
+        dt=doctype,
+        dn=docname,
+        is_private=0
+    )
+    
+    return saved_file
