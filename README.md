@@ -198,33 +198,26 @@ cd ~/frappe-bench
 If the repository is hosted on GitHub:
 
 ```bash
-bench get-app https://github.com/<your-username>/frappe-voice-to-text.git
+bench get-app https://github.com/RANJANIVAIYAPURI/frappe-voice-to-text.git
 ```
 
-Replace:
 
-```text
-<your-username>
-```
-
-with your GitHub username.
 
 ---
 
 ## 3. Install the application on the site
 
 ```bash
-bench --site healthcare.in install-app voice_to_text
+bench --site [your-site] install-app voice_to_text
 ```
 
-Replace `healthcare.in` with your Frappe site name if required.
 
 ---
 
 ## 4. Check installed applications
 
 ```bash
-bench --site healthcare.in list-apps
+bench --site [your-site] list-apps
 ```
 
 You should see:
